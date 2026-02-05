@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Cuartiles</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #4a6fa5;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin: 25px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin: 20px 0 10px;
+        }
+        
+        .description {
+            color: #555;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+        }
+        
+        .card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .example-card {
+            border-left-color: #2ecc71;
+        }
+        
+        .calculator-card {
+            border-left-color: #e74c3c;
+        }
+        
+        .data-input {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .calculate-btn {
+            background-color: #2ecc71;
+        }
+        
+        .calculate-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .clear-btn {
+            background-color: #e74c3c;
+        }
+        
+        .clear-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .result {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .quartiles-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            gap: 15px;
+        }
+        
+        .quartile-box {
+            flex: 1;
+            min-width: 200px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.05);
+        }
+        
+        .quartile-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 5px;
+        }
+        
+        .q1 { border-top: 4px solid #e74c3c; }
+        .q2 { border-top: 4px solid #3498db; }
+        .q3 { border-top: 4px solid #2ecc71; }
+        
+        .sorted-data {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .step {
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 3px solid #3498db;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .step-content {
+            display: inline-block;
+            width: calc(100% - 40px);
+            vertical-align: top;
+        }
+        
+        .formula {
+            font-family: monospace;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: inline-block;
+        }
+        
+        .note {
+            background-color: #fff8e1;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.95em;
+            border-left: 3px solid #ffc107;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .quartiles-container {
+                flex-direction: column;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Calculadora de Cuartiles</h1>
+            <p class="description">
+                Los cuartiles son valores que dividen un conjunto de datos ordenados en cuatro partes iguales. 
+                Q1 (primer cuartil) separa el 25% inferior, Q2 (segundo cuartil o mediana) separa el 50%, y Q3 (tercer cuartil) separa el 75%.
+            </p>
+        </header>
+        
+        <section>
+            <h2>Ejemplo Explicado Paso a Paso</h2>
+            <div class="card example-card">
+                <h3>Ejemplo: Calcular los cuartiles del siguiente conjunto de datos</h3>
+                <p><strong>Datos:</strong> 12, 7, 15, 8, 10, 6, 14, 18, 20, 9, 11, 13</p>
+                
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <div class="step-content">
+                        <p><strong>Ordenar los datos de menor a mayor:</strong></p>
+                        <p>6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 20</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <div class="step-content">
+                        <p><strong>Encontrar la mediana (Q2):</strong></p>
+                        <p>Con 12 datos (número par), la mediana es el promedio de los dos valores centrales:</p>
+                        <p>Posiciones centrales: 6ª y 7ª (11 y 12)</p>
+                        <p class="formula">Q2 = (11 + 12) / 2 = 11.5</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <div class="step-content">
+                        <p><strong>Encontrar Q1 (mediana de la mitad inferior):</strong></p>
+                        <p>Mitad inferior (sin incluir la mediana si es necesario): 6, 7, 8, 9, 10, 11</p>
+                        <p>Con 6 datos (número par), Q1 es el promedio de los valores centrales:</p>
+                        <p>Posiciones centrales: 3ª y 4ª (8 y 9)</p>
+                        <p class="formula">Q1 = (8 + 9) / 2 = 8.5</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <div class="step-content">
+                        <p><strong>Encontrar Q3 (mediana de la mitad superior):</strong></p>
+                        <p>Mitad superior: 12, 13, 14, 15, 18, 20</p>
+                        <p>Con 6 datos (número par), Q3 es el promedio de los valores centrales:</p>
+                        <p>Posiciones centrales: 3ª y 4ª (14 y 15)</p>
+                        <p class="formula">Q3 = (14 + 15) / 2 = 14.5</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <div class="step-content">
+                        <p><strong>Resultados:</strong></p>
+                        <div class="quartiles-container">
+                            <div class="quartile-box q1">
+                                <p>Q1 (Primer cuartil)</p>
+                                <div class="quartile-value">8.5</div>
+                                <p>25% de los datos son ≤ 8.5</p>
+                            </div>
+                            <div class="quartile-box q2">
+                                <p>Q2 (Mediana)</p>
+                                <div class="quartile-value">11.5</div>
+                                <p>50% de los datos son ≤ 11.5</p>
+                            </div>
+                            <div class="quartile-box q3">
+                                <p>Q3 (Tercer cuartil)</p>
+                                <div class="quartile-value">14.5</div>
+                                <p>75% de los datos son ≤ 14.5</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <p><strong>Nota:</strong> Existen diferentes métodos para calcular cuartiles cuando el número de datos no es múltiplo de 4. Esta calculadora usa el método que incluye la mediana en ambas mitades cuando el número de datos es impar.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section>
+            <h2>Calculadora de Cuartiles</h2>
+            <div class="card calculator-card">
+                <p>Ingresa tus datos numéricos separados por comas, espacios o saltos de línea:</p>
+                
+                <div class="data-input">
+                    <textarea id="dataInput" placeholder="Ejemplo: 12, 7, 15, 8, 10, 6, 14, 18, 20, 9, 11, 13">12, 7, 15, 8, 10, 6, 14, 18, 20, 9, 11, 13</textarea>
+                    
+                    <div class="buttons">
+                        <button id="calculateBtn" class="calculate-btn">Calcular Cuartiles</button>
+                        <button id="clearBtn" class="clear-btn">Limpiar</button>
+                        <button id="loadExampleBtn">Cargar Ejemplo</button>
+                    </div>
+                </div>
+                
+                <div id="result" class="result">
+                    <h3>Resultados</h3>
+                    <p><strong>Datos ordenados:</strong></p>
+                    <div id="sortedData" class="sorted-data"></div>
+                    
+                    <div id="quartilesResult" class="quartiles-container">
+                        <!-- Los cuartiles se insertarán aquí dinámicamente -->
+                    </div>
+                    
+                    <div id="calculationSteps">
+                        <!-- Los pasos de cálculo se insertarán aquí -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>Calculadora de Cuartiles &copy; 2023 | Herramienta educativa para estadística descriptiva</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos del DOM
+            const dataInput = document.getElementById('dataInput');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const loadExampleBtn = document.getElementById('loadExampleBtn');
+            const resultDiv = document.getElementById('result');
+            const sortedDataDiv = document.getElementById('sortedData');
+            const quartilesResultDiv = document.getElementById('quartilesResult');
+            const calculationStepsDiv = document.getElementById('calculationSteps');
+            
+            // Ejemplo de datos
+            const exampleData = "12, 7, 15, 8, 10, 6, 14, 18, 20, 9, 11, 13";
+            
+            // Función para parsear los datos ingresados
+            function parseData(input) {
+                // Reemplazar saltos de línea por comas y dividir por comas
+                const dataString = input.replace(/\n/g, ',').replace(/\s+/g, '');
+                const numbers = dataString.split(',')
+                    .map(item => parseFloat(item))
+                    .filter(item => !isNaN(item));
+                
+                return numbers;
+            }
+            
+            // Función para calcular cuartiles
+            function calculateQuartiles(data) {
+                // Ordenar los datos
+                const sortedData = [...data].sort((a, b) => a - b);
+                const n = sortedData.length;
+                
+                // Función para encontrar la mediana de un subconjunto
+                function findMedian(subset) {
+                    const len = subset.length;
+                    const mid = Math.floor(len / 2);
+                    
+                    if (len % 2 === 0) {
+                        // Número par de elementos: promedio de los dos centrales
+                        return (subset[mid - 1] + subset[mid]) / 2;
+                    } else {
+                        // Número impar de elementos: valor central
+                        return subset[mid];
+                    }
+                }
+                
+                // Calcular Q2 (mediana)
+                let q2 = findMedian(sortedData);
+                
+                // Calcular Q1 (mediana de la primera mitad)
+                let lowerHalf;
+                if (n % 2 === 0) {
+                    // Número par de elementos: primera mitad exacta
+                    lowerHalf = sortedData.slice(0, n / 2);
+                } else {
+                    // Número impar de elementos: incluir la mediana en ambas mitades
+                    lowerHalf = sortedData.slice(0, Math.floor(n / 2) + 1);
+                }
+                let q1 = findMedian(lowerHalf);
+                
+                // Calcular Q3 (mediana de la segunda mitad)
+                let upperHalf;
+                if (n % 2 === 0) {
+                    // Número par de elementos: segunda mitad exacta
+                    upperHalf = sortedData.slice(n / 2);
+                } else {
+                    // Número impar de elementos: incluir la mediana en ambas mitades
+                    upperHalf = sortedData.slice(Math.floor(n / 2));
+                }
+                let q3 = findMedian(upperHalf);
+                
+                return {
+                    q1: q1,
+                    q2: q2,
+                    q3: q3,
+                    sortedData: sortedData,
+                    n: n
+                };
+            }
+            
+            // Función para mostrar los resultados
+            function displayResults(data) {
+                const quartiles = calculateQuartiles(data);
+                
+                // Mostrar datos ordenados
+                sortedDataDiv.textContent = quartiles.sortedData.join(', ');
+                
+                // Mostrar cuartiles
+                quartilesResultDiv.innerHTML = `
+                    <div class="quartile-box q1">
+                        <p>Q1 (Primer cuartil)</p>
+                        <div class="quartile-value">${quartiles.q1.toFixed(2)}</div>
+                        <p>25% de los datos son ≤ ${quartiles.q1.toFixed(2)}</p>
+                    </div>
+                    <div class="quartile-box q2">
+                        <p>Q2 (Mediana)</p>
+                        <div class="quartile-value">${quartiles.q2.toFixed(2)}</div>
+                        <p>50% de los datos son ≤ ${quartiles.q2.toFixed(2)}</p>
+                    </div>
+                    <div class="quartile-box q3">
+                        <p>Q3 (Tercer cuartil)</p>
+                        <div class="quartile-value">${quartiles.q3.toFixed(2)}</div>
+                        <p>75% de los datos son ≤ ${quartiles.q3.toFixed(2)}</p>
+                    </div>
+                `;
+                
+                // Mostrar pasos de cálculo
+                calculationStepsDiv.innerHTML = `
+                    <h3>Pasos del cálculo
